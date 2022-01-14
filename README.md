@@ -1,4 +1,4 @@
-# ThreadsPackage
+# Threads Package in 8051 assembly / Small Device C Compiler
 Threads Package Project - Programmed in C and 8051 assembly
 
 This is my implementation of the Threads Package project for the undergraduate FALL 2021, OS course in NTHU in Hsinchu Taiwan. It is divided into 4 parts: 
