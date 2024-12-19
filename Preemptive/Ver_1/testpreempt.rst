@@ -1,6 +1,6 @@
                                       1 ;--------------------------------------------------------
-                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
-                                      3 ; Version 4.1.0 #12072 (Mac OS X ppc)
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.4.0 #14620 (Mac OS X ppc)
                                       4 ;--------------------------------------------------------
                                       5 	.module testpreempt
                                       6 	.optsdcc -mmcs51 --model-small
@@ -232,12 +232,12 @@
                            000022   232 _BUFFER	=	0x0022
                            000023   233 _item	=	0x0023
                                     234 ;--------------------------------------------------------
-                                    235 ; overlayable items in internal ram 
+                                    235 ; overlayable items in internal ram
                                     236 ;--------------------------------------------------------
                                     237 ;--------------------------------------------------------
-                                    238 ; Stack segment in internal ram 
+                                    238 ; Stack segment in internal ram
                                     239 ;--------------------------------------------------------
-                                    240 	.area	SSEG
+                                    240 	.area SSEG
       00003B                        241 __start__stack:
       00003B                        242 	.ds	1
                                     243 
@@ -261,7 +261,7 @@
                                     261 ;--------------------------------------------------------
                                     262 	.area PSEG    (PAG,XDATA)
                                     263 ;--------------------------------------------------------
-                                    264 ; external ram data
+                                    264 ; uninitialized external ram data
                                     265 ;--------------------------------------------------------
                                     266 	.area XSEG    (XDATA)
                                     267 ;--------------------------------------------------------
@@ -269,7 +269,7 @@
                                     269 ;--------------------------------------------------------
                                     270 	.area XABS    (ABS,XDATA)
                                     271 ;--------------------------------------------------------
-                                    272 ; external initialized ram data
+                                    272 ; initialized external ram data
                                     273 ;--------------------------------------------------------
                                     274 	.area XISEG   (XDATA)
                                     275 	.area HOME    (CODE)
@@ -283,7 +283,7 @@
                                     283 	.area GSFINAL (CODE)
                                     284 	.area CSEG    (CODE)
                                     285 ;--------------------------------------------------------
-                                    286 ; interrupt vector 
+                                    286 ; interrupt vector
                                     287 ;--------------------------------------------------------
                                     288 	.area HOME    (CODE)
       000000                        289 __interrupt_vect:
@@ -470,7 +470,7 @@
                                     470 ;	-----------------------------------------
       000069                        471 _timer0_ISR:
                                     472 ;	testpreempt.c:75: __endasm;
-      000069 02 00 EB         [24]  473 	ljmp	_myTimer0Handler
+      000069 02 00 EA         [24]  473 	ljmp	_myTimer0Handler
                                     474 ;	testpreempt.c:76: }
       00006C 32               [24]  475 	reti
                                     476 ;	eliminated unneeded mov psw,# (no regs used in bank)

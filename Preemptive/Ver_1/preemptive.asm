@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.1.0 #12072 (Mac OS X ppc)
+; File Created by SDCC : free open source ISO C Compiler 
+; Version 4.4.0 #14620 (Mac OS X ppc)
 ;--------------------------------------------------------
 	.module preemptive
 	.optsdcc -mmcs51 --model-small
@@ -231,7 +231,7 @@ _tempBitMask	=	0x0038
 _tempSP	=	0x0039
 _shift	=	0x003b
 ;--------------------------------------------------------
-; overlayable items in internal ram 
+; overlayable items in internal ram
 ;--------------------------------------------------------
 	.area	OSEG    (OVR,DATA)
 	.area	OSEG    (OVR,DATA)
@@ -260,7 +260,7 @@ _tempPSW:
 ;--------------------------------------------------------
 	.area PSEG    (PAG,XDATA)
 ;--------------------------------------------------------
-; external ram data
+; uninitialized external ram data
 ;--------------------------------------------------------
 	.area XSEG    (XDATA)
 ;--------------------------------------------------------
@@ -268,7 +268,7 @@ _tempPSW:
 ;--------------------------------------------------------
 	.area XABS    (ABS,XDATA)
 ;--------------------------------------------------------
-; external initialized ram data
+; initialized external ram data
 ;--------------------------------------------------------
 	.area XISEG   (XDATA)
 	.area HOME    (CODE)
@@ -332,7 +332,7 @@ _Bootstrap:
 	mov	_currThr,dpl
 ;	preemptive.c:61: RESTORESTATE;
 	mov	a,_currThr
-	add	a,#_SPArray
+	add	a, #_SPArray
 	mov	r1,a
 	mov	_SP,@r1
 	POP PSW 
@@ -361,7 +361,7 @@ _ThreadCreate:
 	mov	a,#0x0f
 	cjne	a,_threadBitMask,00102$
 ;	preemptive.c:70: return -1;
-	mov	dpl,#0xff
+	mov	dpl, #0xff
 	ret
 00102$:
 ;	preemptive.c:74: threadBitMask |= ((threadBitMask+1) & (~threadBitMask));
@@ -369,7 +369,6 @@ _ThreadCreate:
 	inc	r7
 	mov	a,_threadBitMask
 	cpl	a
-	mov	r6,a
 	anl	a,r7
 	orl	_threadBitMask,a
 ;	preemptive.c:78: tempBitMask = threadBitMask;
@@ -415,7 +414,7 @@ _ThreadCreate:
 	PUSH	_tempPSW ;; PSW
 ;	preemptive.c:105: SPArray[threadId] = SP;
 	mov	a,r7
-	add	a,#_SPArray
+	add	a, #_SPArray
 	mov	r0,a
 	mov	@r0,_SP
 ;	preemptive.c:108: SP = tempSP;
@@ -424,7 +423,7 @@ _ThreadCreate:
 ;	assignBit
 	setb	_EA
 ;	preemptive.c:112: return threadId;
-	mov	dpl,r7
+	mov	dpl, r7
 ;	preemptive.c:113: }
 	ret
 ;------------------------------------------------------------
@@ -447,18 +446,18 @@ _myTimer0Handler:
 	PUSH DPH 
 	PUSH PSW 
 	mov	a,_currThr
-	add	a,#_SPArray
+	add	a, #_SPArray
 	mov	r0,a
 	mov	@r0,_SP
 ;	preemptive.c:121: shift = (char)0x01 << currThr;
 	mov	b,_currThr
 	inc	b
 	mov	a,#0x01
-	sjmp	00125$
-00123$:
+	sjmp	00130$
+00129$:
 	add	a,acc
-00125$:
-	djnz	b,00123$
+00130$:
+	djnz	b,00129$
 	mov	_shift,a
 ;	preemptive.c:122: char pos = currThr;
 	mov	r7,_currThr
@@ -475,7 +474,13 @@ _myTimer0Handler:
 00102$:
 ;	preemptive.c:128: shift = (shift << 1) | (shift >>7);
 	mov	a,_shift
+	add	a,acc
+	mov	r6,a
+	mov	a,_shift
 	rl	a
+	anl	a,#0x01
+	mov	r5,a
+	orl	a,r6
 	mov	_shift,a
 ;	preemptive.c:129: pos++;
 	inc	r7
@@ -488,7 +493,7 @@ _myTimer0Handler:
 	mov	_currThr,r7
 ;	preemptive.c:136: RESTORESTATE;
 	mov	a,_currThr
-	add	a,#_SPArray
+	add	a, #_SPArray
 	mov	r1,a
 	mov	_SP,@r1
 	POP PSW 
@@ -520,18 +525,18 @@ _ThreadYield:
 	PUSH DPH 
 	PUSH PSW 
 	mov	a,_currThr
-	add	a,#_SPArray
+	add	a, #_SPArray
 	mov	r0,a
 	mov	@r0,_SP
 ;	preemptive.c:148: shift = (char)0x01 << currThr;
 	mov	b,_currThr
 	inc	b
 	mov	a,#0x01
-	sjmp	00125$
-00123$:
+	sjmp	00130$
+00129$:
 	add	a,acc
-00125$:
-	djnz	b,00123$
+00130$:
+	djnz	b,00129$
 	mov	_shift,a
 ;	preemptive.c:149: char pos = currThr;
 	mov	r7,_currThr
@@ -548,7 +553,13 @@ _ThreadYield:
 00102$:
 ;	preemptive.c:156: shift = (shift << 1) | (shift >>7);
 	mov	a,_shift
+	add	a,acc
+	mov	r6,a
+	mov	a,_shift
 	rl	a
+	anl	a,#0x01
+	mov	r5,a
+	orl	a,r6
 	mov	_shift,a
 ;	preemptive.c:157: pos++;
 	inc	r7
@@ -561,7 +572,7 @@ _ThreadYield:
 	mov	_currThr,r7
 ;	preemptive.c:164: RESTORESTATE;
 	mov	a,_currThr
-	add	a,#_SPArray
+	add	a, #_SPArray
 	mov	r1,a
 	mov	_SP,@r1
 	POP PSW 

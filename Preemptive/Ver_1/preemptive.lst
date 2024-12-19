@@ -1,6 +1,6 @@
                                       1 ;--------------------------------------------------------
-                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
-                                      3 ; Version 4.1.0 #12072 (Mac OS X ppc)
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.4.0 #14620 (Mac OS X ppc)
                                       4 ;--------------------------------------------------------
                                       5 	.module preemptive
                                       6 	.optsdcc -mmcs51 --model-small
@@ -231,7 +231,7 @@
                            000039   231 _tempSP	=	0x0039
                            00003B   232 _shift	=	0x003b
                                     233 ;--------------------------------------------------------
-                                    234 ; overlayable items in internal ram 
+                                    234 ; overlayable items in internal ram
                                     235 ;--------------------------------------------------------
                                     236 	.area	OSEG    (OVR,DATA)
                                     237 	.area	OSEG    (OVR,DATA)
@@ -260,7 +260,7 @@
                                     260 ;--------------------------------------------------------
                                     261 	.area PSEG    (PAG,XDATA)
                                     262 ;--------------------------------------------------------
-                                    263 ; external ram data
+                                    263 ; uninitialized external ram data
                                     264 ;--------------------------------------------------------
                                     265 	.area XSEG    (XDATA)
                                     266 ;--------------------------------------------------------
@@ -268,7 +268,7 @@
                                     268 ;--------------------------------------------------------
                                     269 	.area XABS    (ABS,XDATA)
                                     270 ;--------------------------------------------------------
-                                    271 ; external initialized ram data
+                                    271 ; initialized external ram data
                                     272 ;--------------------------------------------------------
                                     273 	.area XISEG   (XDATA)
                                     274 	.area HOME    (CODE)
@@ -332,7 +332,7 @@
       000011 85 82 36         [24]  332 	mov	_currThr,dpl
                                     333 ;	preemptive.c:61: RESTORESTATE;
       000014 E5 36            [12]  334 	mov	a,_currThr
-      000016 24 32            [12]  335 	add	a,#_SPArray
+      000016 24 32            [12]  335 	add	a, #_SPArray
       000018 F9               [12]  336 	mov	r1,a
       000019 87 81            [24]  337 	mov	_SP,@r1
       00001B D0 D0            [24]  338 	POP PSW 
@@ -361,7 +361,7 @@
       000028 74 0F            [12]  361 	mov	a,#0x0f
       00002A B5 37 04         [24]  362 	cjne	a,_threadBitMask,00102$
                                     363 ;	preemptive.c:70: return -1;
-      00002D 75 82 FF         [24]  364 	mov	dpl,#0xff
+      00002D 75 82 FF         [24]  364 	mov	dpl, #0xff
       000030 22               [24]  365 	ret
       000031                        366 00102$:
                                     367 ;	preemptive.c:74: threadBitMask |= ((threadBitMask+1) & (~threadBitMask));
@@ -369,209 +369,220 @@
       000033 0F               [12]  369 	inc	r7
       000034 E5 37            [12]  370 	mov	a,_threadBitMask
       000036 F4               [12]  371 	cpl	a
-      000037 FE               [12]  372 	mov	r6,a
-      000038 5F               [12]  373 	anl	a,r7
-      000039 42 37            [12]  374 	orl	_threadBitMask,a
-                                    375 ;	preemptive.c:78: tempBitMask = threadBitMask;
-      00003B 85 37 38         [24]  376 	mov	_tempBitMask,_threadBitMask
-                                    377 ;	preemptive.c:79: while(tempBitMask>>=1){
-      00003E 7F 00            [12]  378 	mov	r7,#0x00
-      000040                        379 00103$:
-      000040 E5 38            [12]  380 	mov	a,_tempBitMask
-      000042 C3               [12]  381 	clr	c
-      000043 13               [12]  382 	rrc	a
-      000044 FE               [12]  383 	mov	r6,a
-      000045 8E 38            [24]  384 	mov	_tempBitMask,r6
-      000047 60 03            [24]  385 	jz	00105$
-                                    386 ;	preemptive.c:80: threadId++;
-      000049 0F               [12]  387 	inc	r7
-      00004A 80 F4            [24]  388 	sjmp	00103$
-      00004C                        389 00105$:
-                                    390 ;	preemptive.c:84: char startingSP = (char)((threadId^(0x01<<2))<<4);
-      00004C 74 04            [12]  391 	mov	a,#0x04
-      00004E 6F               [12]  392 	xrl	a,r7
-      00004F C4               [12]  393 	swap	a
-      000050 54 F0            [12]  394 	anl	a,#0xf0
-      000052 FE               [12]  395 	mov	r6,a
-                                    396 ;	preemptive.c:87: tempSP = SP; 
-      000053 85 81 39         [24]  397 	mov	_tempSP,_SP
-                                    398 ;	preemptive.c:88: SP = startingSP;
-      000056 8E 81            [24]  399 	mov	_SP,r6
-                                    400 ;	preemptive.c:91: tempPSW ^= (char)(threadId<<3);
-      000058 8F 06            [24]  401 	mov	ar6,r7
-      00005A EE               [12]  402 	mov	a,r6
-      00005B C4               [12]  403 	swap	a
-      00005C 03               [12]  404 	rr	a
-      00005D 54 F8            [12]  405 	anl	a,#0xf8
-      00005F FE               [12]  406 	mov	r6,a
-      000060 62*3A            [12]  407 	xrl	_tempPSW,a
-                                    408 ;	preemptive.c:102: __endasm;
-      000062 C0 82            [24]  409 	PUSH	DPL ;; low-byte of fp parameter
-      000064 C0 83            [24]  410 	PUSH	DPH ;; high-byte of fp parameter
-      000066 C0*21            [24]  411 	PUSH	_pushZero ;; ACC
-      000068 C0*21            [24]  412 	PUSH	_pushZero ;; B
-      00006A C0*21            [24]  413 	PUSH	_pushZero ;; DPL
-      00006C C0*21            [24]  414 	PUSH	_pushZero ;; DPH
-      00006E C0*3A            [24]  415 	PUSH	_tempPSW ;; PSW
-                                    416 ;	preemptive.c:105: SPArray[threadId] = SP;
-      000070 EF               [12]  417 	mov	a,r7
-      000071 24 32            [12]  418 	add	a,#_SPArray
-      000073 F8               [12]  419 	mov	r0,a
-      000074 A6 81            [24]  420 	mov	@r0,_SP
-                                    421 ;	preemptive.c:108: SP = tempSP;
-      000076 85 39 81         [24]  422 	mov	_SP,_tempSP
-                                    423 ;	preemptive.c:110: EA = 1;
-                                    424 ;	assignBit
-      000079 D2 AF            [12]  425 	setb	_EA
-                                    426 ;	preemptive.c:112: return threadId;
-      00007B 8F 82            [24]  427 	mov	dpl,r7
-                                    428 ;	preemptive.c:113: }
-      00007D 22               [24]  429 	ret
-                                    430 ;------------------------------------------------------------
-                                    431 ;Allocation info for local variables in function 'myTimer0Handler'
-                                    432 ;------------------------------------------------------------
-                                    433 ;pos                       Allocated to registers r7 
-                                    434 ;------------------------------------------------------------
-                                    435 ;	preemptive.c:116: void myTimer0Handler(void){
-                                    436 ;	-----------------------------------------
-                                    437 ;	 function myTimer0Handler
-                                    438 ;	-----------------------------------------
-      00007E                        439 _myTimer0Handler:
-                                    440 ;	preemptive.c:117: EA = 0; //Critical section
-                                    441 ;	assignBit
-      00007E C2 AF            [12]  442 	clr	_EA
-                                    443 ;	preemptive.c:119: SAVESTATE;
-      000080 C0 E0            [24]  444 	PUSH ACC 
-      000082 C0 F0            [24]  445 	PUSH B 
-      000084 C0 82            [24]  446 	PUSH DPL 
-      000086 C0 83            [24]  447 	PUSH DPH 
-      000088 C0 D0            [24]  448 	PUSH PSW 
-      00008A E5 36            [12]  449 	mov	a,_currThr
-      00008C 24 32            [12]  450 	add	a,#_SPArray
-      00008E F8               [12]  451 	mov	r0,a
-      00008F A6 81            [24]  452 	mov	@r0,_SP
-                                    453 ;	preemptive.c:121: shift = (char)0x01 << currThr;
-      000091 85 36 F0         [24]  454 	mov	b,_currThr
-      000094 05 F0            [12]  455 	inc	b
-      000096 74 01            [12]  456 	mov	a,#0x01
-      000098 80 02            [24]  457 	sjmp	00125$
-      00009A                        458 00123$:
-      00009A 25 E0            [12]  459 	add	a,acc
-      00009C                        460 00125$:
-      00009C D5 F0 FB         [24]  461 	djnz	b,00123$
-      00009F F5 3B            [12]  462 	mov	_shift,a
-                                    463 ;	preemptive.c:122: char pos = currThr;
-      0000A1 AF 36            [24]  464 	mov	r7,_currThr
-                                    465 ;	preemptive.c:123: do{
-      0000A3                        466 00106$:
-                                    467 ;	preemptive.c:124: if(shift == (char)0x08){
-      0000A3 74 08            [12]  468 	mov	a,#0x08
-      0000A5 B5 3B 07         [24]  469 	cjne	a,_shift,00102$
-                                    470 ;	preemptive.c:125: shift = 0x01;
-      0000A8 75 3B 01         [24]  471 	mov	_shift,#0x01
-                                    472 ;	preemptive.c:126: pos = 0;
-      0000AB 7F 00            [12]  473 	mov	r7,#0x00
-      0000AD 80 06            [24]  474 	sjmp	00103$
-      0000AF                        475 00102$:
-                                    476 ;	preemptive.c:128: shift = (shift << 1) | (shift >>7);
-      0000AF E5 3B            [12]  477 	mov	a,_shift
-      0000B1 23               [12]  478 	rl	a
-      0000B2 F5 3B            [12]  479 	mov	_shift,a
-                                    480 ;	preemptive.c:129: pos++;
-      0000B4 0F               [12]  481 	inc	r7
-      0000B5                        482 00103$:
-                                    483 ;	preemptive.c:131: if(shift & threadBitMask){
-      0000B5 E5 37            [12]  484 	mov	a,_threadBitMask
-      0000B7 55 3B            [12]  485 	anl	a,_shift
-      0000B9 60 E8            [24]  486 	jz	00106$
-                                    487 ;	preemptive.c:132: currThr = pos;
-      0000BB 8F 36            [24]  488 	mov	_currThr,r7
-                                    489 ;	preemptive.c:136: RESTORESTATE;
-      0000BD E5 36            [12]  490 	mov	a,_currThr
-      0000BF 24 32            [12]  491 	add	a,#_SPArray
-      0000C1 F9               [12]  492 	mov	r1,a
-      0000C2 87 81            [24]  493 	mov	_SP,@r1
-      0000C4 D0 D0            [24]  494 	POP PSW 
-      0000C6 D0 83            [24]  495 	POP DPH 
-      0000C8 D0 82            [24]  496 	POP DPL 
-      0000CA D0 F0            [24]  497 	POP B 
-      0000CC D0 E0            [24]  498 	POP ACC 
-                                    499 ;	preemptive.c:138: EA = 1;
-                                    500 ;	assignBit
-      0000CE D2 AF            [12]  501 	setb	_EA
-                                    502 ;	preemptive.c:141: __endasm;
-      0000D0 32               [24]  503 	reti
-                                    504 ;	preemptive.c:142: }
-      0000D1 22               [24]  505 	ret
-                                    506 ;------------------------------------------------------------
-                                    507 ;Allocation info for local variables in function 'ThreadYield'
-                                    508 ;------------------------------------------------------------
-                                    509 ;pos                       Allocated to registers r7 
-                                    510 ;------------------------------------------------------------
-                                    511 ;	preemptive.c:145: void ThreadYield(void) {
-                                    512 ;	-----------------------------------------
-                                    513 ;	 function ThreadYield
-                                    514 ;	-----------------------------------------
-      0000D2                        515 _ThreadYield:
-                                    516 ;	preemptive.c:146: SAVESTATE;
-      0000D2 C0 E0            [24]  517 	PUSH ACC 
-      0000D4 C0 F0            [24]  518 	PUSH B 
-      0000D6 C0 82            [24]  519 	PUSH DPL 
-      0000D8 C0 83            [24]  520 	PUSH DPH 
-      0000DA C0 D0            [24]  521 	PUSH PSW 
-      0000DC E5 36            [12]  522 	mov	a,_currThr
-      0000DE 24 32            [12]  523 	add	a,#_SPArray
-      0000E0 F8               [12]  524 	mov	r0,a
-      0000E1 A6 81            [24]  525 	mov	@r0,_SP
-                                    526 ;	preemptive.c:148: shift = (char)0x01 << currThr;
-      0000E3 85 36 F0         [24]  527 	mov	b,_currThr
-      0000E6 05 F0            [12]  528 	inc	b
-      0000E8 74 01            [12]  529 	mov	a,#0x01
-      0000EA 80 02            [24]  530 	sjmp	00125$
-      0000EC                        531 00123$:
-      0000EC 25 E0            [12]  532 	add	a,acc
-      0000EE                        533 00125$:
-      0000EE D5 F0 FB         [24]  534 	djnz	b,00123$
-      0000F1 F5 3B            [12]  535 	mov	_shift,a
-                                    536 ;	preemptive.c:149: char pos = currThr;
-      0000F3 AF 36            [24]  537 	mov	r7,_currThr
-                                    538 ;	preemptive.c:151: do{
-      0000F5                        539 00106$:
-                                    540 ;	preemptive.c:152: if(shift == (char)0x08){
-      0000F5 74 08            [12]  541 	mov	a,#0x08
-      0000F7 B5 3B 07         [24]  542 	cjne	a,_shift,00102$
-                                    543 ;	preemptive.c:153: shift = 0x01;
-      0000FA 75 3B 01         [24]  544 	mov	_shift,#0x01
-                                    545 ;	preemptive.c:154: pos = 0;
-      0000FD 7F 00            [12]  546 	mov	r7,#0x00
-      0000FF 80 06            [24]  547 	sjmp	00103$
-      000101                        548 00102$:
-                                    549 ;	preemptive.c:156: shift = (shift << 1) | (shift >>7);
-      000101 E5 3B            [12]  550 	mov	a,_shift
-      000103 23               [12]  551 	rl	a
-      000104 F5 3B            [12]  552 	mov	_shift,a
-                                    553 ;	preemptive.c:157: pos++;
-      000106 0F               [12]  554 	inc	r7
-      000107                        555 00103$:
-                                    556 ;	preemptive.c:159: if(shift & threadBitMask){
-      000107 E5 37            [12]  557 	mov	a,_threadBitMask
-      000109 55 3B            [12]  558 	anl	a,_shift
-      00010B 60 E8            [24]  559 	jz	00106$
-                                    560 ;	preemptive.c:160: currThr = pos;
-      00010D 8F 36            [24]  561 	mov	_currThr,r7
-                                    562 ;	preemptive.c:164: RESTORESTATE;
-      00010F E5 36            [12]  563 	mov	a,_currThr
-      000111 24 32            [12]  564 	add	a,#_SPArray
-      000113 F9               [12]  565 	mov	r1,a
-      000114 87 81            [24]  566 	mov	_SP,@r1
-      000116 D0 D0            [24]  567 	POP PSW 
-      000118 D0 83            [24]  568 	POP DPH 
-      00011A D0 82            [24]  569 	POP DPL 
-      00011C D0 F0            [24]  570 	POP B 
-      00011E D0 E0            [24]  571 	POP ACC 
-                                    572 ;	preemptive.c:165: }
-      000120 22               [24]  573 	ret
-                                    574 	.area CSEG    (CODE)
-                                    575 	.area CONST   (CODE)
-                                    576 	.area XINIT   (CODE)
-                                    577 	.area CABS    (ABS,CODE)
+      000037 5F               [12]  372 	anl	a,r7
+      000038 42 37            [12]  373 	orl	_threadBitMask,a
+                                    374 ;	preemptive.c:78: tempBitMask = threadBitMask;
+      00003A 85 37 38         [24]  375 	mov	_tempBitMask,_threadBitMask
+                                    376 ;	preemptive.c:79: while(tempBitMask>>=1){
+      00003D 7F 00            [12]  377 	mov	r7,#0x00
+      00003F                        378 00103$:
+      00003F E5 38            [12]  379 	mov	a,_tempBitMask
+      000041 C3               [12]  380 	clr	c
+      000042 13               [12]  381 	rrc	a
+      000043 FE               [12]  382 	mov	r6,a
+      000044 8E 38            [24]  383 	mov	_tempBitMask,r6
+      000046 60 03            [24]  384 	jz	00105$
+                                    385 ;	preemptive.c:80: threadId++;
+      000048 0F               [12]  386 	inc	r7
+      000049 80 F4            [24]  387 	sjmp	00103$
+      00004B                        388 00105$:
+                                    389 ;	preemptive.c:84: char startingSP = (char)((threadId^(0x01<<2))<<4);
+      00004B 74 04            [12]  390 	mov	a,#0x04
+      00004D 6F               [12]  391 	xrl	a,r7
+      00004E C4               [12]  392 	swap	a
+      00004F 54 F0            [12]  393 	anl	a,#0xf0
+      000051 FE               [12]  394 	mov	r6,a
+                                    395 ;	preemptive.c:87: tempSP = SP; 
+      000052 85 81 39         [24]  396 	mov	_tempSP,_SP
+                                    397 ;	preemptive.c:88: SP = startingSP;
+      000055 8E 81            [24]  398 	mov	_SP,r6
+                                    399 ;	preemptive.c:91: tempPSW ^= (char)(threadId<<3);
+      000057 8F 06            [24]  400 	mov	ar6,r7
+      000059 EE               [12]  401 	mov	a,r6
+      00005A C4               [12]  402 	swap	a
+      00005B 03               [12]  403 	rr	a
+      00005C 54 F8            [12]  404 	anl	a,#0xf8
+      00005E FE               [12]  405 	mov	r6,a
+      00005F 62*3A            [12]  406 	xrl	_tempPSW,a
+                                    407 ;	preemptive.c:102: __endasm;
+      000061 C0 82            [24]  408 	PUSH	DPL ;; low-byte of fp parameter
+      000063 C0 83            [24]  409 	PUSH	DPH ;; high-byte of fp parameter
+      000065 C0*21            [24]  410 	PUSH	_pushZero ;; ACC
+      000067 C0*21            [24]  411 	PUSH	_pushZero ;; B
+      000069 C0*21            [24]  412 	PUSH	_pushZero ;; DPL
+      00006B C0*21            [24]  413 	PUSH	_pushZero ;; DPH
+      00006D C0*3A            [24]  414 	PUSH	_tempPSW ;; PSW
+                                    415 ;	preemptive.c:105: SPArray[threadId] = SP;
+      00006F EF               [12]  416 	mov	a,r7
+      000070 24 32            [12]  417 	add	a, #_SPArray
+      000072 F8               [12]  418 	mov	r0,a
+      000073 A6 81            [24]  419 	mov	@r0,_SP
+                                    420 ;	preemptive.c:108: SP = tempSP;
+      000075 85 39 81         [24]  421 	mov	_SP,_tempSP
+                                    422 ;	preemptive.c:110: EA = 1;
+                                    423 ;	assignBit
+      000078 D2 AF            [12]  424 	setb	_EA
+                                    425 ;	preemptive.c:112: return threadId;
+      00007A 8F 82            [24]  426 	mov	dpl, r7
+                                    427 ;	preemptive.c:113: }
+      00007C 22               [24]  428 	ret
+                                    429 ;------------------------------------------------------------
+                                    430 ;Allocation info for local variables in function 'myTimer0Handler'
+                                    431 ;------------------------------------------------------------
+                                    432 ;pos                       Allocated to registers r7 
+                                    433 ;------------------------------------------------------------
+                                    434 ;	preemptive.c:116: void myTimer0Handler(void){
+                                    435 ;	-----------------------------------------
+                                    436 ;	 function myTimer0Handler
+                                    437 ;	-----------------------------------------
+      00007D                        438 _myTimer0Handler:
+                                    439 ;	preemptive.c:117: EA = 0; //Critical section
+                                    440 ;	assignBit
+      00007D C2 AF            [12]  441 	clr	_EA
+                                    442 ;	preemptive.c:119: SAVESTATE;
+      00007F C0 E0            [24]  443 	PUSH ACC 
+      000081 C0 F0            [24]  444 	PUSH B 
+      000083 C0 82            [24]  445 	PUSH DPL 
+      000085 C0 83            [24]  446 	PUSH DPH 
+      000087 C0 D0            [24]  447 	PUSH PSW 
+      000089 E5 36            [12]  448 	mov	a,_currThr
+      00008B 24 32            [12]  449 	add	a, #_SPArray
+      00008D F8               [12]  450 	mov	r0,a
+      00008E A6 81            [24]  451 	mov	@r0,_SP
+                                    452 ;	preemptive.c:121: shift = (char)0x01 << currThr;
+      000090 85 36 F0         [24]  453 	mov	b,_currThr
+      000093 05 F0            [12]  454 	inc	b
+      000095 74 01            [12]  455 	mov	a,#0x01
+      000097 80 02            [24]  456 	sjmp	00130$
+      000099                        457 00129$:
+      000099 25 E0            [12]  458 	add	a,acc
+      00009B                        459 00130$:
+      00009B D5 F0 FB         [24]  460 	djnz	b,00129$
+      00009E F5 3B            [12]  461 	mov	_shift,a
+                                    462 ;	preemptive.c:122: char pos = currThr;
+      0000A0 AF 36            [24]  463 	mov	r7,_currThr
+                                    464 ;	preemptive.c:123: do{
+      0000A2                        465 00106$:
+                                    466 ;	preemptive.c:124: if(shift == (char)0x08){
+      0000A2 74 08            [12]  467 	mov	a,#0x08
+      0000A4 B5 3B 07         [24]  468 	cjne	a,_shift,00102$
+                                    469 ;	preemptive.c:125: shift = 0x01;
+      0000A7 75 3B 01         [24]  470 	mov	_shift,#0x01
+                                    471 ;	preemptive.c:126: pos = 0;
+      0000AA 7F 00            [12]  472 	mov	r7,#0x00
+      0000AC 80 0F            [24]  473 	sjmp	00103$
+      0000AE                        474 00102$:
+                                    475 ;	preemptive.c:128: shift = (shift << 1) | (shift >>7);
+      0000AE E5 3B            [12]  476 	mov	a,_shift
+      0000B0 25 E0            [12]  477 	add	a,acc
+      0000B2 FE               [12]  478 	mov	r6,a
+      0000B3 E5 3B            [12]  479 	mov	a,_shift
+      0000B5 23               [12]  480 	rl	a
+      0000B6 54 01            [12]  481 	anl	a,#0x01
+      0000B8 FD               [12]  482 	mov	r5,a
+      0000B9 4E               [12]  483 	orl	a,r6
+      0000BA F5 3B            [12]  484 	mov	_shift,a
+                                    485 ;	preemptive.c:129: pos++;
+      0000BC 0F               [12]  486 	inc	r7
+      0000BD                        487 00103$:
+                                    488 ;	preemptive.c:131: if(shift & threadBitMask){
+      0000BD E5 37            [12]  489 	mov	a,_threadBitMask
+      0000BF 55 3B            [12]  490 	anl	a,_shift
+      0000C1 60 DF            [24]  491 	jz	00106$
+                                    492 ;	preemptive.c:132: currThr = pos;
+      0000C3 8F 36            [24]  493 	mov	_currThr,r7
+                                    494 ;	preemptive.c:136: RESTORESTATE;
+      0000C5 E5 36            [12]  495 	mov	a,_currThr
+      0000C7 24 32            [12]  496 	add	a, #_SPArray
+      0000C9 F9               [12]  497 	mov	r1,a
+      0000CA 87 81            [24]  498 	mov	_SP,@r1
+      0000CC D0 D0            [24]  499 	POP PSW 
+      0000CE D0 83            [24]  500 	POP DPH 
+      0000D0 D0 82            [24]  501 	POP DPL 
+      0000D2 D0 F0            [24]  502 	POP B 
+      0000D4 D0 E0            [24]  503 	POP ACC 
+                                    504 ;	preemptive.c:138: EA = 1;
+                                    505 ;	assignBit
+      0000D6 D2 AF            [12]  506 	setb	_EA
+                                    507 ;	preemptive.c:141: __endasm;
+      0000D8 32               [24]  508 	reti
+                                    509 ;	preemptive.c:142: }
+      0000D9 22               [24]  510 	ret
+                                    511 ;------------------------------------------------------------
+                                    512 ;Allocation info for local variables in function 'ThreadYield'
+                                    513 ;------------------------------------------------------------
+                                    514 ;pos                       Allocated to registers r7 
+                                    515 ;------------------------------------------------------------
+                                    516 ;	preemptive.c:145: void ThreadYield(void) {
+                                    517 ;	-----------------------------------------
+                                    518 ;	 function ThreadYield
+                                    519 ;	-----------------------------------------
+      0000DA                        520 _ThreadYield:
+                                    521 ;	preemptive.c:146: SAVESTATE;
+      0000DA C0 E0            [24]  522 	PUSH ACC 
+      0000DC C0 F0            [24]  523 	PUSH B 
+      0000DE C0 82            [24]  524 	PUSH DPL 
+      0000E0 C0 83            [24]  525 	PUSH DPH 
+      0000E2 C0 D0            [24]  526 	PUSH PSW 
+      0000E4 E5 36            [12]  527 	mov	a,_currThr
+      0000E6 24 32            [12]  528 	add	a, #_SPArray
+      0000E8 F8               [12]  529 	mov	r0,a
+      0000E9 A6 81            [24]  530 	mov	@r0,_SP
+                                    531 ;	preemptive.c:148: shift = (char)0x01 << currThr;
+      0000EB 85 36 F0         [24]  532 	mov	b,_currThr
+      0000EE 05 F0            [12]  533 	inc	b
+      0000F0 74 01            [12]  534 	mov	a,#0x01
+      0000F2 80 02            [24]  535 	sjmp	00130$
+      0000F4                        536 00129$:
+      0000F4 25 E0            [12]  537 	add	a,acc
+      0000F6                        538 00130$:
+      0000F6 D5 F0 FB         [24]  539 	djnz	b,00129$
+      0000F9 F5 3B            [12]  540 	mov	_shift,a
+                                    541 ;	preemptive.c:149: char pos = currThr;
+      0000FB AF 36            [24]  542 	mov	r7,_currThr
+                                    543 ;	preemptive.c:151: do{
+      0000FD                        544 00106$:
+                                    545 ;	preemptive.c:152: if(shift == (char)0x08){
+      0000FD 74 08            [12]  546 	mov	a,#0x08
+      0000FF B5 3B 07         [24]  547 	cjne	a,_shift,00102$
+                                    548 ;	preemptive.c:153: shift = 0x01;
+      000102 75 3B 01         [24]  549 	mov	_shift,#0x01
+                                    550 ;	preemptive.c:154: pos = 0;
+      000105 7F 00            [12]  551 	mov	r7,#0x00
+      000107 80 0F            [24]  552 	sjmp	00103$
+      000109                        553 00102$:
+                                    554 ;	preemptive.c:156: shift = (shift << 1) | (shift >>7);
+      000109 E5 3B            [12]  555 	mov	a,_shift
+      00010B 25 E0            [12]  556 	add	a,acc
+      00010D FE               [12]  557 	mov	r6,a
+      00010E E5 3B            [12]  558 	mov	a,_shift
+      000110 23               [12]  559 	rl	a
+      000111 54 01            [12]  560 	anl	a,#0x01
+      000113 FD               [12]  561 	mov	r5,a
+      000114 4E               [12]  562 	orl	a,r6
+      000115 F5 3B            [12]  563 	mov	_shift,a
+                                    564 ;	preemptive.c:157: pos++;
+      000117 0F               [12]  565 	inc	r7
+      000118                        566 00103$:
+                                    567 ;	preemptive.c:159: if(shift & threadBitMask){
+      000118 E5 37            [12]  568 	mov	a,_threadBitMask
+      00011A 55 3B            [12]  569 	anl	a,_shift
+      00011C 60 DF            [24]  570 	jz	00106$
+                                    571 ;	preemptive.c:160: currThr = pos;
+      00011E 8F 36            [24]  572 	mov	_currThr,r7
+                                    573 ;	preemptive.c:164: RESTORESTATE;
+      000120 E5 36            [12]  574 	mov	a,_currThr
+      000122 24 32            [12]  575 	add	a, #_SPArray
+      000124 F9               [12]  576 	mov	r1,a
+      000125 87 81            [24]  577 	mov	_SP,@r1
+      000127 D0 D0            [24]  578 	POP PSW 
+      000129 D0 83            [24]  579 	POP DPH 
+      00012B D0 82            [24]  580 	POP DPL 
+      00012D D0 F0            [24]  581 	POP B 
+      00012F D0 E0            [24]  582 	POP ACC 
+                                    583 ;	preemptive.c:165: }
+      000131 22               [24]  584 	ret
+                                    585 	.area CSEG    (CODE)
+                                    586 	.area CONST   (CODE)
+                                    587 	.area XINIT   (CODE)
+                                    588 	.area CABS    (ABS,CODE)

@@ -21,8 +21,8 @@ __data __at (0x3B) unsigned static char shift;         //Round-robin shift value
 //SAVESTATE AND RESTORESTATE macros 
 //SAVESTATE
 #define SAVESTATE { \
-        __asm\
-            PUSH ACC\
+        __asm   \
+            PUSH ACC       \
             PUSH  B        \
             PUSH  DPL      \
             PUSH  DPH      \
