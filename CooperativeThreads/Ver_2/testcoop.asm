@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.1.0 #12072 (Mac OS X ppc)
+; File Created by SDCC : free open source ISO C Compiler 
+; Version 4.4.0 #14620 (Mac OS X ppc)
 ;--------------------------------------------------------
 	.module testcoop
 	.optsdcc -mmcs51 --model-small
@@ -232,12 +232,12 @@ _CY	=	0x00d7
 _BUFFER	=	0x0022
 _item	=	0x0023
 ;--------------------------------------------------------
-; overlayable items in internal ram 
+; overlayable items in internal ram
 ;--------------------------------------------------------
 ;--------------------------------------------------------
-; Stack segment in internal ram 
+; Stack segment in internal ram
 ;--------------------------------------------------------
-	.area	SSEG
+	.area SSEG
 __start__stack:
 	.ds	1
 
@@ -261,7 +261,7 @@ _isBufferFull::
 ;--------------------------------------------------------
 	.area PSEG    (PAG,XDATA)
 ;--------------------------------------------------------
-; external ram data
+; uninitialized external ram data
 ;--------------------------------------------------------
 	.area XSEG    (XDATA)
 ;--------------------------------------------------------
@@ -269,7 +269,7 @@ _isBufferFull::
 ;--------------------------------------------------------
 	.area XABS    (ABS,XDATA)
 ;--------------------------------------------------------
-; external initialized ram data
+; initialized external ram data
 ;--------------------------------------------------------
 	.area XISEG   (XDATA)
 	.area HOME    (CODE)
@@ -283,7 +283,7 @@ _isBufferFull::
 	.area GSFINAL (CODE)
 	.area CSEG    (CODE)
 ;--------------------------------------------------------
-; interrupt vector 
+; interrupt vector
 ;--------------------------------------------------------
 	.area HOME    (CODE)
 __interrupt_vect:
@@ -351,86 +351,86 @@ _producer:
 	lcall	_ThreadYield
 	sjmp	00103$
 00105$:
-;	testcoop.c:25: BUFFER = item;       //Write to buffer
+;	testcoop.c:24: BUFFER = item;       //Write to buffer
 	mov	_BUFFER,_item
-;	testcoop.c:26: item++;   
+;	testcoop.c:25: item++;   
 	mov	a,_item
 	inc	a
 	mov	_item,a
-;	testcoop.c:27: isBufferFull = 1; //Buffer full, consumer must reset flag when it consumes
+;	testcoop.c:26: isBufferFull = 1; //Buffer full, consumer must reset flag when it consumes
 ;	assignBit
 	setb	_isBufferFull
-;	testcoop.c:29: }
+;	testcoop.c:28: }
 	sjmp	00107$
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'consumer'
 ;------------------------------------------------------------
-;	testcoop.c:32: void consumer(void){
+;	testcoop.c:31: void consumer(void){
 ;	-----------------------------------------
 ;	 function consumer
 ;	-----------------------------------------
 _consumer:
-;	testcoop.c:34: TMOD = 0x20; 
+;	testcoop.c:33: TMOD = 0x20; 
 	mov	_TMOD,#0x20
-;	testcoop.c:35: TH1 = -6; 
+;	testcoop.c:34: TH1 = -6; 
 	mov	_TH1,#0xfa
-;	testcoop.c:36: SCON = 0x50; 
+;	testcoop.c:35: SCON = 0x50; 
 	mov	_SCON,#0x50
-;	testcoop.c:37: TR1 = 1;
+;	testcoop.c:36: TR1 = 1;
 ;	assignBit
 	setb	_TR1
-;	testcoop.c:38: TI = 0;
+;	testcoop.c:37: TI = 0;
 ;	assignBit
 	clr	_TI
-;	testcoop.c:42: while(!isBufferFull){ 
+;	testcoop.c:41: while(!isBufferFull){ 
 00101$:
 	jb	_isBufferFull,00103$
-;	testcoop.c:43: ThreadYield();
+;	testcoop.c:42: ThreadYield();
 	lcall	_ThreadYield
 	sjmp	00101$
 00103$:
-;	testcoop.c:45: SBUF = BUFFER;    //Write to SBUF
+;	testcoop.c:44: SBUF = BUFFER;    //Write to SBUF
 	mov	_SBUF,_BUFFER
-;	testcoop.c:46: isBufferFull = 0; //Buffer empty, data consumed 
+;	testcoop.c:45: isBufferFull = 0; //Buffer empty, data consumed 
 ;	assignBit
 	clr	_isBufferFull
-;	testcoop.c:49: while(!TI){}
+;	testcoop.c:48: while(!TI){}
 00104$:
-;	testcoop.c:50: TI = 0; //Clear TI flag
+;	testcoop.c:49: TI = 0; //Clear TI flag
 ;	assignBit
 	jbc	_TI,00101$
-;	testcoop.c:52: }
+;	testcoop.c:51: }
 	sjmp	00104$
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'main'
 ;------------------------------------------------------------
-;	testcoop.c:54: void main(void){ 
+;	testcoop.c:53: void main(void){ 
 ;	-----------------------------------------
 ;	 function main
 ;	-----------------------------------------
 _main:
-;	testcoop.c:55: ThreadCreate(producer);  //Create Thread for producer;
+;	testcoop.c:54: ThreadCreate(producer);  //Create Thread for producer;
 	mov	dptr,#_producer
 	lcall	_ThreadCreate
-;	testcoop.c:56: consumer();              //Call consumer;
-;	testcoop.c:57: }
+;	testcoop.c:55: consumer();              //Call consumer;
+;	testcoop.c:56: }
 	ljmp	_consumer
 ;------------------------------------------------------------
 ;Allocation info for local variables in function '_sdcc_gsinit_startup'
 ;------------------------------------------------------------
-;	testcoop.c:60: void _sdcc_gsinit_startup(void) {
+;	testcoop.c:59: void _sdcc_gsinit_startup(void) {
 ;	-----------------------------------------
 ;	 function _sdcc_gsinit_startup
 ;	-----------------------------------------
 __sdcc_gsinit_startup:
-;	testcoop.c:63: __endasm;
+;	testcoop.c:62: __endasm;
 	ljmp	_Bootstrap
-;	testcoop.c:64: }
+;	testcoop.c:63: }
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function '_mcs51_genRAMCLEAR'
 ;------------------------------------------------------------
-;	testcoop.c:65: void _mcs51_genRAMCLEAR(void) { }
+;	testcoop.c:64: void _mcs51_genRAMCLEAR(void) { }
 ;	-----------------------------------------
 ;	 function _mcs51_genRAMCLEAR
 ;	-----------------------------------------
@@ -439,7 +439,7 @@ __mcs51_genRAMCLEAR:
 ;------------------------------------------------------------
 ;Allocation info for local variables in function '_mcs51_genXINIT'
 ;------------------------------------------------------------
-;	testcoop.c:66: void _mcs51_genXINIT(void) { }
+;	testcoop.c:65: void _mcs51_genXINIT(void) { }
 ;	-----------------------------------------
 ;	 function _mcs51_genXINIT
 ;	-----------------------------------------
@@ -448,7 +448,7 @@ __mcs51_genXINIT:
 ;------------------------------------------------------------
 ;Allocation info for local variables in function '_mcs51_genXRAMCLEAR'
 ;------------------------------------------------------------
-;	testcoop.c:67: void _mcs51_genXRAMCLEAR(void) { }
+;	testcoop.c:66: void _mcs51_genXRAMCLEAR(void) { }
 ;	-----------------------------------------
 ;	 function _mcs51_genXRAMCLEAR
 ;	-----------------------------------------

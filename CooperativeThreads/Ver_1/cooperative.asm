@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.1.0 #12072 (Mac OS X ppc)
+; File Created by SDCC : free open source ISO C Compiler 
+; Version 4.4.0 #14620 (Mac OS X ppc)
 ;--------------------------------------------------------
 	.module cooperative
 	.optsdcc -mmcs51 --model-small
@@ -231,7 +231,7 @@ _tempSP	=	0x0039
 _ThreadYield_sloc0_1_0:
 	.ds 2
 ;--------------------------------------------------------
-; overlayable items in internal ram 
+; overlayable items in internal ram
 ;--------------------------------------------------------
 	.area	OSEG    (OVR,DATA)
 ;--------------------------------------------------------
@@ -258,7 +258,7 @@ _tempPSW:
 ;--------------------------------------------------------
 	.area PSEG    (PAG,XDATA)
 ;--------------------------------------------------------
-; external ram data
+; uninitialized external ram data
 ;--------------------------------------------------------
 	.area XSEG    (XDATA)
 ;--------------------------------------------------------
@@ -266,7 +266,7 @@ _tempPSW:
 ;--------------------------------------------------------
 	.area XABS    (ABS,XDATA)
 ;--------------------------------------------------------
-; external initialized ram data
+; initialized external ram data
 ;--------------------------------------------------------
 	.area XISEG   (XDATA)
 	.area HOME    (CODE)
@@ -323,7 +323,7 @@ _Bootstrap:
 	mov	_currThr,dpl
 ;	cooperative.c:45: RESTORESTATE;
 	mov	a,_currThr
-	add	a,#_SPArray
+	add	a, #_SPArray
 	mov	r1,a
 	mov	_SP,@r1
 	POP PSW 
@@ -349,7 +349,7 @@ _ThreadCreate:
 	mov	a,#0x0f
 	cjne	a,_threadBitMask,00102$
 ;	cooperative.c:52: return -1;
-	mov	dpl,#0xff
+	mov	dpl, #0xff
 	ret
 00102$:
 ;	cooperative.c:56: threadBitMask |= ((threadBitMask+1) & (~threadBitMask));
@@ -357,7 +357,6 @@ _ThreadCreate:
 	inc	r7
 	mov	a,_threadBitMask
 	cpl	a
-	mov	r6,a
 	anl	a,r7
 	orl	_threadBitMask,a
 ;	cooperative.c:60: tempBitMask = threadBitMask;
@@ -403,13 +402,13 @@ _ThreadCreate:
 	PUSH	_tempPSW ;; PSW
 ;	cooperative.c:87: SPArray[threadId] = SP;
 	mov	a,r7
-	add	a,#_SPArray
+	add	a, #_SPArray
 	mov	r0,a
 	mov	@r0,_SP
 ;	cooperative.c:90: SP = tempSP;
 	mov	_SP,_tempSP
 ;	cooperative.c:93: return threadId;
-	mov	dpl,r7
+	mov	dpl, r7
 ;	cooperative.c:94: }
 	ret
 ;------------------------------------------------------------
@@ -424,13 +423,13 @@ _ThreadCreate:
 ;	-----------------------------------------
 _ThreadYield:
 ;	cooperative.c:98: SAVESTATE;
-	PUSH ACC 
+	PUSH	ACC 
 	PUSH B 
 	PUSH DPL 
 	PUSH DPH 
 	PUSH PSW 
 	mov	a,_currThr
-	add	a,#_SPArray
+	add	a, #_SPArray
 	mov	r0,a
 	mov	@r0,_SP
 ;	cooperative.c:100: char i = currThr;
@@ -444,28 +443,27 @@ _ThreadYield:
 	mov	dph,r6
 	inc	dptr
 	mov	__modsint_PARM_2,#0x04
-;	1-genFromRTrack replaced	mov	(__modsint_PARM_2 + 1),#0x00
 	mov	(__modsint_PARM_2 + 1),r6
 	push	ar6
 	push	ar5
 	lcall	__modsint
-	mov	r3,dpl
+	mov	r3, dpl
 	pop	ar5
 	pop	ar6
 	mov	b,r3
 	inc	b
 	mov	_ThreadYield_sloc0_1_0,#0x01
 	mov	(_ThreadYield_sloc0_1_0 + 1),#0x00
-	sjmp	00117$
-00116$:
+	sjmp	00121$
+00120$:
 	mov	a,_ThreadYield_sloc0_1_0
 	add	a,_ThreadYield_sloc0_1_0
 	mov	_ThreadYield_sloc0_1_0,a
 	mov	a,(_ThreadYield_sloc0_1_0 + 1)
 	rlc	a
 	mov	(_ThreadYield_sloc0_1_0 + 1),a
-00117$:
-	djnz	b,00116$
+00121$:
+	djnz	b,00120$
 	mov	r2,_threadBitMask
 	mov	r4,#0x00
 	mov	a,_ThreadYield_sloc0_1_0
@@ -482,8 +480,8 @@ _ThreadYield:
 	mov	__modsint_PARM_2,#0x04
 	mov	(__modsint_PARM_2 + 1),#0x00
 	lcall	__modsint
-	mov	r3,dpl
-	mov	r4,dph
+	mov	r3, dpl
+	mov	r4, dph
 	mov	_currThr,r3
 ;	cooperative.c:104: break;
 	sjmp	00105$
@@ -495,15 +493,14 @@ _ThreadYield:
 	mov	__modsint_PARM_2,#0x04
 	mov	(__modsint_PARM_2 + 1),#0x00
 	lcall	__modsint
-	mov	r5,dpl
-	mov	r6,dph
+	mov	r5, dpl
 	mov	ar7,r5
 ;	cooperative.c:107: }while(1);
-	sjmp	00103$
+	ljmp	00103$
 00105$:
 ;	cooperative.c:108: RESTORESTATE;
 	mov	a,_currThr
-	add	a,#_SPArray
+	add	a, #_SPArray
 	mov	r1,a
 	mov	_SP,@r1
 	POP PSW 

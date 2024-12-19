@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.1.0 #12072 (Mac OS X ppc)
+; File Created by SDCC : free open source ISO C Compiler 
+; Version 4.4.0 #14620 (Mac OS X ppc)
 ;--------------------------------------------------------
 	.module testcoop
 	.optsdcc -mmcs51 --model-small
@@ -230,12 +230,12 @@ _CY	=	0x00d7
 ;--------------------------------------------------------
 	.area DSEG    (DATA)
 ;--------------------------------------------------------
-; overlayable items in internal ram 
+; overlayable items in internal ram
 ;--------------------------------------------------------
 ;--------------------------------------------------------
-; Stack segment in internal ram 
+; Stack segment in internal ram
 ;--------------------------------------------------------
-	.area	SSEG
+	.area SSEG
 __start__stack:
 	.ds	1
 
@@ -250,7 +250,7 @@ __start__stack:
 	.org 0x0022
 _BUFFER:
 	.ds 1
-_producer_item_65536_6	=	0x0023
+_producer_item_10000_6	=	0x0023
 	.area IABS    (ABS,DATA)
 ;--------------------------------------------------------
 ; bit data
@@ -263,7 +263,7 @@ _isBufferFull::
 ;--------------------------------------------------------
 	.area PSEG    (PAG,XDATA)
 ;--------------------------------------------------------
-; external ram data
+; uninitialized external ram data
 ;--------------------------------------------------------
 	.area XSEG    (XDATA)
 ;--------------------------------------------------------
@@ -271,7 +271,7 @@ _isBufferFull::
 ;--------------------------------------------------------
 	.area XABS    (ABS,XDATA)
 ;--------------------------------------------------------
-; external initialized ram data
+; initialized external ram data
 ;--------------------------------------------------------
 	.area XISEG   (XDATA)
 	.area HOME    (CODE)
@@ -285,7 +285,7 @@ _isBufferFull::
 	.area GSFINAL (CODE)
 	.area CSEG    (CODE)
 ;--------------------------------------------------------
-; interrupt vector 
+; interrupt vector
 ;--------------------------------------------------------
 	.area HOME    (CODE)
 __interrupt_vect:
@@ -307,7 +307,7 @@ __interrupt_vect:
 ;Allocation info for local variables in function 'producer'
 ;------------------------------------------------------------
 ;	testcoop.c:10: __data __at (0x23) static char item = (char)0x41; 
-	mov	_producer_item_65536_6,#0x41
+	mov	_producer_item_10000_6,#0x41
 ;	testcoop.c:5: __data __at (0x22) static char BUFFER = (char)0;  //1 byte BUFFER variable 
 	mov	_BUFFER,#0x00
 ;	testcoop.c:6: __bit isBufferFull = (char)0; //Bit-addresable register 0x20
@@ -346,11 +346,11 @@ _producer:
 ;	testcoop.c:11: while(1){
 00107$:
 ;	testcoop.c:12: if(item > (char)0x5A){
-	mov	a,_producer_item_65536_6
+	mov	a,_producer_item_10000_6
 	add	a,#0xff - 0x5a
 	jnc	00103$
 ;	testcoop.c:13: item = (char)0x41;
-	mov	_producer_item_65536_6,#0x41
+	mov	_producer_item_10000_6,#0x41
 ;	testcoop.c:15: while(isBufferFull){ //Poll-Buffer
 00103$:
 	jnb	_isBufferFull,00105$
@@ -359,11 +359,11 @@ _producer:
 	sjmp	00103$
 00105$:
 ;	testcoop.c:18: BUFFER = item;       //Write to buffer
-	mov	_BUFFER,_producer_item_65536_6
+	mov	_BUFFER,_producer_item_10000_6
 ;	testcoop.c:19: item++;   
-	mov	a,_producer_item_65536_6
+	mov	a,_producer_item_10000_6
 	inc	a
-	mov	_producer_item_65536_6,a
+	mov	_producer_item_10000_6,a
 ;	testcoop.c:20: isBufferFull = 1; //Buffer full, consumer must reset flag when it consumes
 ;	assignBit
 	setb	_isBufferFull

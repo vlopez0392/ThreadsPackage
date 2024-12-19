@@ -1,6 +1,6 @@
                                       1 ;--------------------------------------------------------
-                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
-                                      3 ; Version 4.1.0 #12072 (Mac OS X ppc)
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.4.0 #14620 (Mac OS X ppc)
                                       4 ;--------------------------------------------------------
                                       5 	.module testcoop
                                       6 	.optsdcc -mmcs51 --model-small
@@ -230,12 +230,12 @@
                                     230 ;--------------------------------------------------------
                                     231 	.area DSEG    (DATA)
                                     232 ;--------------------------------------------------------
-                                    233 ; overlayable items in internal ram 
+                                    233 ; overlayable items in internal ram
                                     234 ;--------------------------------------------------------
                                     235 ;--------------------------------------------------------
-                                    236 ; Stack segment in internal ram 
+                                    236 ; Stack segment in internal ram
                                     237 ;--------------------------------------------------------
-                                    238 	.area	SSEG
+                                    238 	.area SSEG
       00003B                        239 __start__stack:
       00003B                        240 	.ds	1
                                     241 
@@ -250,7 +250,7 @@
       000022                        250 	.org 0x0022
       000022                        251 _BUFFER:
       000022                        252 	.ds 1
-                           000023   253 _producer_item_65536_6	=	0x0023
+                           000023   253 _producer_item_10000_6	=	0x0023
                                     254 	.area IABS    (ABS,DATA)
                                     255 ;--------------------------------------------------------
                                     256 ; bit data
@@ -263,7 +263,7 @@
                                     263 ;--------------------------------------------------------
                                     264 	.area PSEG    (PAG,XDATA)
                                     265 ;--------------------------------------------------------
-                                    266 ; external ram data
+                                    266 ; uninitialized external ram data
                                     267 ;--------------------------------------------------------
                                     268 	.area XSEG    (XDATA)
                                     269 ;--------------------------------------------------------
@@ -271,7 +271,7 @@
                                     271 ;--------------------------------------------------------
                                     272 	.area XABS    (ABS,XDATA)
                                     273 ;--------------------------------------------------------
-                                    274 ; external initialized ram data
+                                    274 ; initialized external ram data
                                     275 ;--------------------------------------------------------
                                     276 	.area XISEG   (XDATA)
                                     277 	.area HOME    (CODE)
@@ -285,7 +285,7 @@
                                     285 	.area GSFINAL (CODE)
                                     286 	.area CSEG    (CODE)
                                     287 ;--------------------------------------------------------
-                                    288 ; interrupt vector 
+                                    288 ; interrupt vector
                                     289 ;--------------------------------------------------------
                                     290 	.area HOME    (CODE)
       000000                        291 __interrupt_vect:
@@ -307,7 +307,7 @@
                                     307 ;Allocation info for local variables in function 'producer'
                                     308 ;------------------------------------------------------------
                                     309 ;	testcoop.c:10: __data __at (0x23) static char item = (char)0x41; 
-      000006 75 23 41         [24]  310 	mov	_producer_item_65536_6,#0x41
+      000006 75 23 41         [24]  310 	mov	_producer_item_10000_6,#0x41
                                     311 ;	testcoop.c:5: __data __at (0x22) static char BUFFER = (char)0;  //1 byte BUFFER variable 
       000009 75 22 00         [24]  312 	mov	_BUFFER,#0x00
                                     313 ;	testcoop.c:6: __bit isBufferFull = (char)0; //Bit-addresable register 0x20
@@ -346,24 +346,24 @@
                                     346 ;	testcoop.c:11: while(1){
       000017                        347 00107$:
                                     348 ;	testcoop.c:12: if(item > (char)0x5A){
-      000017 E5 23            [12]  349 	mov	a,_producer_item_65536_6
+      000017 E5 23            [12]  349 	mov	a,_producer_item_10000_6
       000019 24 A5            [12]  350 	add	a,#0xff - 0x5a
       00001B 50 03            [24]  351 	jnc	00103$
                                     352 ;	testcoop.c:13: item = (char)0x41;
-      00001D 75 23 41         [24]  353 	mov	_producer_item_65536_6,#0x41
+      00001D 75 23 41         [24]  353 	mov	_producer_item_10000_6,#0x41
                                     354 ;	testcoop.c:15: while(isBufferFull){ //Poll-Buffer
       000020                        355 00103$:
       000020 30 00 05         [24]  356 	jnb	_isBufferFull,00105$
                                     357 ;	testcoop.c:16: ThreadYield();
-      000023 12 00 DC         [24]  358 	lcall	_ThreadYield
+      000023 12 00 DB         [24]  358 	lcall	_ThreadYield
       000026 80 F8            [24]  359 	sjmp	00103$
       000028                        360 00105$:
                                     361 ;	testcoop.c:18: BUFFER = item;       //Write to buffer
-      000028 85 23 22         [24]  362 	mov	_BUFFER,_producer_item_65536_6
+      000028 85 23 22         [24]  362 	mov	_BUFFER,_producer_item_10000_6
                                     363 ;	testcoop.c:19: item++;   
-      00002B E5 23            [12]  364 	mov	a,_producer_item_65536_6
+      00002B E5 23            [12]  364 	mov	a,_producer_item_10000_6
       00002D 04               [12]  365 	inc	a
-      00002E F5 23            [12]  366 	mov	_producer_item_65536_6,a
+      00002E F5 23            [12]  366 	mov	_producer_item_10000_6,a
                                     367 ;	testcoop.c:20: isBufferFull = 1; //Buffer full, consumer must reset flag when it consumes
                                     368 ;	assignBit
       000030 D2 00            [12]  369 	setb	_isBufferFull
@@ -393,7 +393,7 @@
       000041                        393 00101$:
       000041 20 00 05         [24]  394 	jb	_isBufferFull,00103$
                                     395 ;	testcoop.c:36: ThreadYield();
-      000044 12 00 DC         [24]  396 	lcall	_ThreadYield
+      000044 12 00 DB         [24]  396 	lcall	_ThreadYield
       000047 80 F8            [24]  397 	sjmp	00101$
       000049                        398 00103$:
                                     399 ;	testcoop.c:38: SBUF = BUFFER;    //Write to SBUF
@@ -405,7 +405,7 @@
       00004E                        405 00104$:
       00004E 20 99 05         [24]  406 	jb	_TI,00106$
                                     407 ;	testcoop.c:43: ThreadYield();
-      000051 12 00 DC         [24]  408 	lcall	_ThreadYield
+      000051 12 00 DB         [24]  408 	lcall	_ThreadYield
       000054 80 F8            [24]  409 	sjmp	00104$
       000056                        410 00106$:
                                     411 ;	testcoop.c:45: TI = 0; //Clear TI flag

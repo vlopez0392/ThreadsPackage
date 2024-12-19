@@ -1,6 +1,6 @@
                                       1 ;--------------------------------------------------------
-                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
-                                      3 ; Version 4.1.0 #12072 (Mac OS X ppc)
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.4.0 #14620 (Mac OS X ppc)
                                       4 ;--------------------------------------------------------
                                       5 	.module cooperative
                                       6 	.optsdcc -mmcs51 --model-small
@@ -231,7 +231,7 @@
       000008                        231 _ThreadYield_sloc0_1_0:
       000008                        232 	.ds 2
                                     233 ;--------------------------------------------------------
-                                    234 ; overlayable items in internal ram 
+                                    234 ; overlayable items in internal ram
                                     235 ;--------------------------------------------------------
                                     236 	.area	OSEG    (OVR,DATA)
                                     237 ;--------------------------------------------------------
@@ -258,7 +258,7 @@
                                     258 ;--------------------------------------------------------
                                     259 	.area PSEG    (PAG,XDATA)
                                     260 ;--------------------------------------------------------
-                                    261 ; external ram data
+                                    261 ; uninitialized external ram data
                                     262 ;--------------------------------------------------------
                                     263 	.area XSEG    (XDATA)
                                     264 ;--------------------------------------------------------
@@ -266,7 +266,7 @@
                                     266 ;--------------------------------------------------------
                                     267 	.area XABS    (ABS,XDATA)
                                     268 ;--------------------------------------------------------
-                                    269 ; external initialized ram data
+                                    269 ; initialized external ram data
                                     270 ;--------------------------------------------------------
                                     271 	.area XISEG   (XDATA)
                                     272 	.area HOME    (CODE)
@@ -323,7 +323,7 @@
       000073 85 82 36         [24]  323 	mov	_currThr,dpl
                                     324 ;	cooperative.c:45: RESTORESTATE;
       000076 E5 36            [12]  325 	mov	a,_currThr
-      000078 24 32            [12]  326 	add	a,#_SPArray
+      000078 24 32            [12]  326 	add	a, #_SPArray
       00007A F9               [12]  327 	mov	r1,a
       00007B 87 81            [24]  328 	mov	_SP,@r1
       00007D D0 D0            [24]  329 	POP PSW 
@@ -349,7 +349,7 @@
       000088 74 0F            [12]  349 	mov	a,#0x0f
       00008A B5 37 04         [24]  350 	cjne	a,_threadBitMask,00102$
                                     351 ;	cooperative.c:52: return -1;
-      00008D 75 82 FF         [24]  352 	mov	dpl,#0xff
+      00008D 75 82 FF         [24]  352 	mov	dpl, #0xff
       000090 22               [24]  353 	ret
       000091                        354 00102$:
                                     355 ;	cooperative.c:56: threadBitMask |= ((threadBitMask+1) & (~threadBitMask));
@@ -357,163 +357,160 @@
       000093 0F               [12]  357 	inc	r7
       000094 E5 37            [12]  358 	mov	a,_threadBitMask
       000096 F4               [12]  359 	cpl	a
-      000097 FE               [12]  360 	mov	r6,a
-      000098 5F               [12]  361 	anl	a,r7
-      000099 42 37            [12]  362 	orl	_threadBitMask,a
-                                    363 ;	cooperative.c:60: tempBitMask = threadBitMask;
-      00009B 85 37 38         [24]  364 	mov	_tempBitMask,_threadBitMask
-                                    365 ;	cooperative.c:61: while(tempBitMask>>=1){
-      00009E 7F 00            [12]  366 	mov	r7,#0x00
-      0000A0                        367 00103$:
-      0000A0 E5 38            [12]  368 	mov	a,_tempBitMask
-      0000A2 C3               [12]  369 	clr	c
-      0000A3 13               [12]  370 	rrc	a
-      0000A4 FE               [12]  371 	mov	r6,a
-      0000A5 8E 38            [24]  372 	mov	_tempBitMask,r6
-      0000A7 60 03            [24]  373 	jz	00105$
-                                    374 ;	cooperative.c:62: threadId++;
-      0000A9 0F               [12]  375 	inc	r7
-      0000AA 80 F4            [24]  376 	sjmp	00103$
-      0000AC                        377 00105$:
-                                    378 ;	cooperative.c:66: char startingSP = (char)((threadId^(0x01<<2))<<4);
-      0000AC 74 04            [12]  379 	mov	a,#0x04
-      0000AE 6F               [12]  380 	xrl	a,r7
-      0000AF C4               [12]  381 	swap	a
-      0000B0 54 F0            [12]  382 	anl	a,#0xf0
-      0000B2 FE               [12]  383 	mov	r6,a
-                                    384 ;	cooperative.c:69: tempSP = SP; 
-      0000B3 85 81 39         [24]  385 	mov	_tempSP,_SP
-                                    386 ;	cooperative.c:70: SP = startingSP;
-      0000B6 8E 81            [24]  387 	mov	_SP,r6
-                                    388 ;	cooperative.c:73: tempPSW ^= (char)(threadId<<3);
-      0000B8 8F 06            [24]  389 	mov	ar6,r7
-      0000BA EE               [12]  390 	mov	a,r6
-      0000BB C4               [12]  391 	swap	a
-      0000BC 03               [12]  392 	rr	a
-      0000BD 54 F8            [12]  393 	anl	a,#0xf8
-      0000BF FE               [12]  394 	mov	r6,a
-      0000C0 62 3A            [12]  395 	xrl	_tempPSW,a
-                                    396 ;	cooperative.c:84: __endasm;
-      0000C2 C0 82            [24]  397 	PUSH	DPL ;; low-byte of fp parameter
-      0000C4 C0 83            [24]  398 	PUSH	DPH ;; high-byte of fp parameter
-      0000C6 C0 21            [24]  399 	PUSH	_pushZero ;; ACC
-      0000C8 C0 21            [24]  400 	PUSH	_pushZero ;; B
-      0000CA C0 21            [24]  401 	PUSH	_pushZero ;; DPL
-      0000CC C0 21            [24]  402 	PUSH	_pushZero ;; DPH
-      0000CE C0 3A            [24]  403 	PUSH	_tempPSW ;; PSW
-                                    404 ;	cooperative.c:87: SPArray[threadId] = SP;
-      0000D0 EF               [12]  405 	mov	a,r7
-      0000D1 24 32            [12]  406 	add	a,#_SPArray
-      0000D3 F8               [12]  407 	mov	r0,a
-      0000D4 A6 81            [24]  408 	mov	@r0,_SP
-                                    409 ;	cooperative.c:90: SP = tempSP;
-      0000D6 85 39 81         [24]  410 	mov	_SP,_tempSP
-                                    411 ;	cooperative.c:93: return threadId;
-      0000D9 8F 82            [24]  412 	mov	dpl,r7
-                                    413 ;	cooperative.c:94: }
-      0000DB 22               [24]  414 	ret
-                                    415 ;------------------------------------------------------------
-                                    416 ;Allocation info for local variables in function 'ThreadYield'
-                                    417 ;------------------------------------------------------------
-                                    418 ;i                         Allocated to registers r7 
-                                    419 ;sloc0                     Allocated with name '_ThreadYield_sloc0_1_0'
-                                    420 ;------------------------------------------------------------
-                                    421 ;	cooperative.c:97: void ThreadYield(void) {
-                                    422 ;	-----------------------------------------
-                                    423 ;	 function ThreadYield
-                                    424 ;	-----------------------------------------
-      0000DC                        425 _ThreadYield:
-                                    426 ;	cooperative.c:98: SAVESTATE;
-      0000DC C0 E0            [24]  427 	PUSH ACC 
-      0000DE C0 F0            [24]  428 	PUSH B 
-      0000E0 C0 82            [24]  429 	PUSH DPL 
-      0000E2 C0 83            [24]  430 	PUSH DPH 
-      0000E4 C0 D0            [24]  431 	PUSH PSW 
-      0000E6 E5 36            [12]  432 	mov	a,_currThr
-      0000E8 24 32            [12]  433 	add	a,#_SPArray
-      0000EA F8               [12]  434 	mov	r0,a
-      0000EB A6 81            [24]  435 	mov	@r0,_SP
-                                    436 ;	cooperative.c:100: char i = currThr;
-      0000ED AF 36            [24]  437 	mov	r7,_currThr
-                                    438 ;	cooperative.c:101: do{
-      0000EF                        439 00103$:
-                                    440 ;	cooperative.c:102: if((0x01<<((i+1)%(MAXTHREADS))) & threadBitMask){
-      0000EF 8F 05            [24]  441 	mov	ar5,r7
-      0000F1 7E 00            [12]  442 	mov	r6,#0x00
-      0000F3 8D 82            [24]  443 	mov	dpl,r5
-      0000F5 8E 83            [24]  444 	mov	dph,r6
-      0000F7 A3               [24]  445 	inc	dptr
-      0000F8 75 0A 04         [24]  446 	mov	__modsint_PARM_2,#0x04
-                                    447 ;	1-genFromRTrack replaced	mov	(__modsint_PARM_2 + 1),#0x00
-      0000FB 8E 0B            [24]  448 	mov	(__modsint_PARM_2 + 1),r6
-      0000FD C0 06            [24]  449 	push	ar6
-      0000FF C0 05            [24]  450 	push	ar5
-      000101 12 01 BF         [24]  451 	lcall	__modsint
-      000104 AB 82            [24]  452 	mov	r3,dpl
-      000106 D0 05            [24]  453 	pop	ar5
-      000108 D0 06            [24]  454 	pop	ar6
-      00010A 8B F0            [24]  455 	mov	b,r3
-      00010C 05 F0            [12]  456 	inc	b
-      00010E 75 08 01         [24]  457 	mov	_ThreadYield_sloc0_1_0,#0x01
-      000111 75 09 00         [24]  458 	mov	(_ThreadYield_sloc0_1_0 + 1),#0x00
-      000114 80 0B            [24]  459 	sjmp	00117$
-      000116                        460 00116$:
-      000116 E5 08            [12]  461 	mov	a,_ThreadYield_sloc0_1_0
-      000118 25 08            [12]  462 	add	a,_ThreadYield_sloc0_1_0
-      00011A F5 08            [12]  463 	mov	_ThreadYield_sloc0_1_0,a
-      00011C E5 09            [12]  464 	mov	a,(_ThreadYield_sloc0_1_0 + 1)
-      00011E 33               [12]  465 	rlc	a
-      00011F F5 09            [12]  466 	mov	(_ThreadYield_sloc0_1_0 + 1),a
-      000121                        467 00117$:
-      000121 D5 F0 F2         [24]  468 	djnz	b,00116$
-      000124 AA 37            [24]  469 	mov	r2,_threadBitMask
-      000126 7C 00            [12]  470 	mov	r4,#0x00
-      000128 E5 08            [12]  471 	mov	a,_ThreadYield_sloc0_1_0
-      00012A 52 02            [12]  472 	anl	ar2,a
-      00012C E5 09            [12]  473 	mov	a,(_ThreadYield_sloc0_1_0 + 1)
-      00012E 52 04            [12]  474 	anl	ar4,a
-      000130 EA               [12]  475 	mov	a,r2
-      000131 4C               [12]  476 	orl	a,r4
-      000132 60 16            [24]  477 	jz	00102$
-                                    478 ;	cooperative.c:103: currThr = (i+1)%MAXTHREADS;
-      000134 8D 82            [24]  479 	mov	dpl,r5
-      000136 8E 83            [24]  480 	mov	dph,r6
-      000138 A3               [24]  481 	inc	dptr
-      000139 75 0A 04         [24]  482 	mov	__modsint_PARM_2,#0x04
-      00013C 75 0B 00         [24]  483 	mov	(__modsint_PARM_2 + 1),#0x00
-      00013F 12 01 BF         [24]  484 	lcall	__modsint
-      000142 AB 82            [24]  485 	mov	r3,dpl
-      000144 AC 83            [24]  486 	mov	r4,dph
-      000146 8B 36            [24]  487 	mov	_currThr,r3
-                                    488 ;	cooperative.c:104: break;
-      000148 80 16            [24]  489 	sjmp	00105$
-      00014A                        490 00102$:
-                                    491 ;	cooperative.c:106: i = (i+1)%MAXTHREADS;
-      00014A 8D 82            [24]  492 	mov	dpl,r5
-      00014C 8E 83            [24]  493 	mov	dph,r6
-      00014E A3               [24]  494 	inc	dptr
-      00014F 75 0A 04         [24]  495 	mov	__modsint_PARM_2,#0x04
-      000152 75 0B 00         [24]  496 	mov	(__modsint_PARM_2 + 1),#0x00
-      000155 12 01 BF         [24]  497 	lcall	__modsint
-      000158 AD 82            [24]  498 	mov	r5,dpl
-      00015A AE 83            [24]  499 	mov	r6,dph
-      00015C 8D 07            [24]  500 	mov	ar7,r5
-                                    501 ;	cooperative.c:107: }while(1);
-      00015E 80 8F            [24]  502 	sjmp	00103$
-      000160                        503 00105$:
-                                    504 ;	cooperative.c:108: RESTORESTATE;
-      000160 E5 36            [12]  505 	mov	a,_currThr
-      000162 24 32            [12]  506 	add	a,#_SPArray
-      000164 F9               [12]  507 	mov	r1,a
-      000165 87 81            [24]  508 	mov	_SP,@r1
-      000167 D0 D0            [24]  509 	POP PSW 
-      000169 D0 83            [24]  510 	POP DPH 
-      00016B D0 82            [24]  511 	POP DPL 
-      00016D D0 F0            [24]  512 	POP B 
-      00016F D0 E0            [24]  513 	POP ACC 
-                                    514 ;	cooperative.c:109: }
-      000171 22               [24]  515 	ret
-                                    516 	.area CSEG    (CODE)
-                                    517 	.area CONST   (CODE)
-                                    518 	.area XINIT   (CODE)
-                                    519 	.area CABS    (ABS,CODE)
+      000097 5F               [12]  360 	anl	a,r7
+      000098 42 37            [12]  361 	orl	_threadBitMask,a
+                                    362 ;	cooperative.c:60: tempBitMask = threadBitMask;
+      00009A 85 37 38         [24]  363 	mov	_tempBitMask,_threadBitMask
+                                    364 ;	cooperative.c:61: while(tempBitMask>>=1){
+      00009D 7F 00            [12]  365 	mov	r7,#0x00
+      00009F                        366 00103$:
+      00009F E5 38            [12]  367 	mov	a,_tempBitMask
+      0000A1 C3               [12]  368 	clr	c
+      0000A2 13               [12]  369 	rrc	a
+      0000A3 FE               [12]  370 	mov	r6,a
+      0000A4 8E 38            [24]  371 	mov	_tempBitMask,r6
+      0000A6 60 03            [24]  372 	jz	00105$
+                                    373 ;	cooperative.c:62: threadId++;
+      0000A8 0F               [12]  374 	inc	r7
+      0000A9 80 F4            [24]  375 	sjmp	00103$
+      0000AB                        376 00105$:
+                                    377 ;	cooperative.c:66: char startingSP = (char)((threadId^(0x01<<2))<<4);
+      0000AB 74 04            [12]  378 	mov	a,#0x04
+      0000AD 6F               [12]  379 	xrl	a,r7
+      0000AE C4               [12]  380 	swap	a
+      0000AF 54 F0            [12]  381 	anl	a,#0xf0
+      0000B1 FE               [12]  382 	mov	r6,a
+                                    383 ;	cooperative.c:69: tempSP = SP; 
+      0000B2 85 81 39         [24]  384 	mov	_tempSP,_SP
+                                    385 ;	cooperative.c:70: SP = startingSP;
+      0000B5 8E 81            [24]  386 	mov	_SP,r6
+                                    387 ;	cooperative.c:73: tempPSW ^= (char)(threadId<<3);
+      0000B7 8F 06            [24]  388 	mov	ar6,r7
+      0000B9 EE               [12]  389 	mov	a,r6
+      0000BA C4               [12]  390 	swap	a
+      0000BB 03               [12]  391 	rr	a
+      0000BC 54 F8            [12]  392 	anl	a,#0xf8
+      0000BE FE               [12]  393 	mov	r6,a
+      0000BF 62 3A            [12]  394 	xrl	_tempPSW,a
+                                    395 ;	cooperative.c:84: __endasm;
+      0000C1 C0 82            [24]  396 	PUSH	DPL ;; low-byte of fp parameter
+      0000C3 C0 83            [24]  397 	PUSH	DPH ;; high-byte of fp parameter
+      0000C5 C0 21            [24]  398 	PUSH	_pushZero ;; ACC
+      0000C7 C0 21            [24]  399 	PUSH	_pushZero ;; B
+      0000C9 C0 21            [24]  400 	PUSH	_pushZero ;; DPL
+      0000CB C0 21            [24]  401 	PUSH	_pushZero ;; DPH
+      0000CD C0 3A            [24]  402 	PUSH	_tempPSW ;; PSW
+                                    403 ;	cooperative.c:87: SPArray[threadId] = SP;
+      0000CF EF               [12]  404 	mov	a,r7
+      0000D0 24 32            [12]  405 	add	a, #_SPArray
+      0000D2 F8               [12]  406 	mov	r0,a
+      0000D3 A6 81            [24]  407 	mov	@r0,_SP
+                                    408 ;	cooperative.c:90: SP = tempSP;
+      0000D5 85 39 81         [24]  409 	mov	_SP,_tempSP
+                                    410 ;	cooperative.c:93: return threadId;
+      0000D8 8F 82            [24]  411 	mov	dpl, r7
+                                    412 ;	cooperative.c:94: }
+      0000DA 22               [24]  413 	ret
+                                    414 ;------------------------------------------------------------
+                                    415 ;Allocation info for local variables in function 'ThreadYield'
+                                    416 ;------------------------------------------------------------
+                                    417 ;i                         Allocated to registers r7 
+                                    418 ;sloc0                     Allocated with name '_ThreadYield_sloc0_1_0'
+                                    419 ;------------------------------------------------------------
+                                    420 ;	cooperative.c:97: void ThreadYield(void) {
+                                    421 ;	-----------------------------------------
+                                    422 ;	 function ThreadYield
+                                    423 ;	-----------------------------------------
+      0000DB                        424 _ThreadYield:
+                                    425 ;	cooperative.c:98: SAVESTATE;
+      0000DB C0 E0            [24]  426 	PUSH	ACC 
+      0000DD C0 F0            [24]  427 	PUSH B 
+      0000DF C0 82            [24]  428 	PUSH DPL 
+      0000E1 C0 83            [24]  429 	PUSH DPH 
+      0000E3 C0 D0            [24]  430 	PUSH PSW 
+      0000E5 E5 36            [12]  431 	mov	a,_currThr
+      0000E7 24 32            [12]  432 	add	a, #_SPArray
+      0000E9 F8               [12]  433 	mov	r0,a
+      0000EA A6 81            [24]  434 	mov	@r0,_SP
+                                    435 ;	cooperative.c:100: char i = currThr;
+      0000EC AF 36            [24]  436 	mov	r7,_currThr
+                                    437 ;	cooperative.c:101: do{
+      0000EE                        438 00103$:
+                                    439 ;	cooperative.c:102: if((0x01<<((i+1)%(MAXTHREADS))) & threadBitMask){
+      0000EE 8F 05            [24]  440 	mov	ar5,r7
+      0000F0 7E 00            [12]  441 	mov	r6,#0x00
+      0000F2 8D 82            [24]  442 	mov	dpl,r5
+      0000F4 8E 83            [24]  443 	mov	dph,r6
+      0000F6 A3               [24]  444 	inc	dptr
+      0000F7 75 0A 04         [24]  445 	mov	__modsint_PARM_2,#0x04
+      0000FA 8E 0B            [24]  446 	mov	(__modsint_PARM_2 + 1),r6
+      0000FC C0 06            [24]  447 	push	ar6
+      0000FE C0 05            [24]  448 	push	ar5
+      000100 12 01 BD         [24]  449 	lcall	__modsint
+      000103 AB 82            [24]  450 	mov	r3, dpl
+      000105 D0 05            [24]  451 	pop	ar5
+      000107 D0 06            [24]  452 	pop	ar6
+      000109 8B F0            [24]  453 	mov	b,r3
+      00010B 05 F0            [12]  454 	inc	b
+      00010D 75 08 01         [24]  455 	mov	_ThreadYield_sloc0_1_0,#0x01
+      000110 75 09 00         [24]  456 	mov	(_ThreadYield_sloc0_1_0 + 1),#0x00
+      000113 80 0B            [24]  457 	sjmp	00121$
+      000115                        458 00120$:
+      000115 E5 08            [12]  459 	mov	a,_ThreadYield_sloc0_1_0
+      000117 25 08            [12]  460 	add	a,_ThreadYield_sloc0_1_0
+      000119 F5 08            [12]  461 	mov	_ThreadYield_sloc0_1_0,a
+      00011B E5 09            [12]  462 	mov	a,(_ThreadYield_sloc0_1_0 + 1)
+      00011D 33               [12]  463 	rlc	a
+      00011E F5 09            [12]  464 	mov	(_ThreadYield_sloc0_1_0 + 1),a
+      000120                        465 00121$:
+      000120 D5 F0 F2         [24]  466 	djnz	b,00120$
+      000123 AA 37            [24]  467 	mov	r2,_threadBitMask
+      000125 7C 00            [12]  468 	mov	r4,#0x00
+      000127 E5 08            [12]  469 	mov	a,_ThreadYield_sloc0_1_0
+      000129 52 02            [12]  470 	anl	ar2,a
+      00012B E5 09            [12]  471 	mov	a,(_ThreadYield_sloc0_1_0 + 1)
+      00012D 52 04            [12]  472 	anl	ar4,a
+      00012F EA               [12]  473 	mov	a,r2
+      000130 4C               [12]  474 	orl	a,r4
+      000131 60 16            [24]  475 	jz	00102$
+                                    476 ;	cooperative.c:103: currThr = (i+1)%MAXTHREADS;
+      000133 8D 82            [24]  477 	mov	dpl,r5
+      000135 8E 83            [24]  478 	mov	dph,r6
+      000137 A3               [24]  479 	inc	dptr
+      000138 75 0A 04         [24]  480 	mov	__modsint_PARM_2,#0x04
+      00013B 75 0B 00         [24]  481 	mov	(__modsint_PARM_2 + 1),#0x00
+      00013E 12 01 BD         [24]  482 	lcall	__modsint
+      000141 AB 82            [24]  483 	mov	r3, dpl
+      000143 AC 83            [24]  484 	mov	r4, dph
+      000145 8B 36            [24]  485 	mov	_currThr,r3
+                                    486 ;	cooperative.c:104: break;
+      000147 80 15            [24]  487 	sjmp	00105$
+      000149                        488 00102$:
+                                    489 ;	cooperative.c:106: i = (i+1)%MAXTHREADS;
+      000149 8D 82            [24]  490 	mov	dpl,r5
+      00014B 8E 83            [24]  491 	mov	dph,r6
+      00014D A3               [24]  492 	inc	dptr
+      00014E 75 0A 04         [24]  493 	mov	__modsint_PARM_2,#0x04
+      000151 75 0B 00         [24]  494 	mov	(__modsint_PARM_2 + 1),#0x00
+      000154 12 01 BD         [24]  495 	lcall	__modsint
+      000157 AD 82            [24]  496 	mov	r5, dpl
+      000159 8D 07            [24]  497 	mov	ar7,r5
+                                    498 ;	cooperative.c:107: }while(1);
+      00015B 02 00 EE         [24]  499 	ljmp	00103$
+      00015E                        500 00105$:
+                                    501 ;	cooperative.c:108: RESTORESTATE;
+      00015E E5 36            [12]  502 	mov	a,_currThr
+      000160 24 32            [12]  503 	add	a, #_SPArray
+      000162 F9               [12]  504 	mov	r1,a
+      000163 87 81            [24]  505 	mov	_SP,@r1
+      000165 D0 D0            [24]  506 	POP PSW 
+      000167 D0 83            [24]  507 	POP DPH 
+      000169 D0 82            [24]  508 	POP DPL 
+      00016B D0 F0            [24]  509 	POP B 
+      00016D D0 E0            [24]  510 	POP ACC 
+                                    511 ;	cooperative.c:109: }
+      00016F 22               [24]  512 	ret
+                                    513 	.area CSEG    (CODE)
+                                    514 	.area CONST   (CODE)
+                                    515 	.area XINIT   (CODE)
+                                    516 	.area CABS    (ABS,CODE)

@@ -15,7 +15,7 @@ __data __at (0x3A) static char tempPSW = (char)0x00;   //Temporary PSW
 //SAVESTATE
 #define SAVESTATE { \
         __asm\
-            PUSH  ACC\
+            PUSH  ACC      \
             PUSH  B        \
             PUSH  DPL      \
             PUSH  DPH      \
